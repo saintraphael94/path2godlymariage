@@ -80,7 +80,7 @@ export default function Admin() {
     setAttendance((data as unknown as AttendanceRow[]) ?? []);
   };
 
-  const updateUserStatus = async (userId: string, status: string) => {
+  const updateUserStatus = async (userId: string, status: "active" | "completed") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("user_id", userId);
     if (error) toast.error("Failed to update status");
     else {
