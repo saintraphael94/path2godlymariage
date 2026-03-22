@@ -167,7 +167,7 @@ export default function Admin() {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <Select value={u.status} onValueChange={v => updateUserStatus(u.user_id, v)}>
+                          <Select value={u.status} onValueChange={v => updateUserStatus(u.user_id, v as "active" | "completed")}>
                             <SelectTrigger className="h-8 w-28">
                               <SelectValue />
                             </SelectTrigger>
