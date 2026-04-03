@@ -49,6 +49,8 @@ export default function Admin() {
   const [attendance, setAttendance] = useState<AttendanceRow[]>([]);
   const [editSession, setEditSession] = useState<SessionData | null>(null);
   const [filterMonth, setFilterMonth] = useState<string>("all");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate("/dashboard");
