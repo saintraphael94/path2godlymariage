@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Users, BookOpen, CheckSquare, Download } from "lucide-react";
+import { Users, BookOpen, CheckSquare, Download, Upload, FileText, Trash2, Loader2 } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -29,6 +29,7 @@ interface SessionData {
   title: string;
   bible_study_content: string | null;
   breakout_notes: string | null;
+  file_urls: string[] | null;
   is_locked: boolean;
 }
 
@@ -49,6 +50,8 @@ export default function Admin() {
   const [attendance, setAttendance] = useState<AttendanceRow[]>([]);
   const [editSession, setEditSession] = useState<SessionData | null>(null);
   const [filterMonth, setFilterMonth] = useState<string>("all");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate("/dashboard");
@@ -89,12 +92,51 @@ export default function Admin() {
     }
   };
 
+  const uploadFile = async (file: File) => {
+    if (!editSession) return;
+    if (file.type !== "application/pdf") {
+      toast.error("Only PDF files are allowed");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File must be under 10MB");
+      return;
+    }
+    setUploading(true);
+    const filePath = `month-${editSession.month}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("materials").upload(filePath, file);
+    if (uploadError) {
+      toast.error("Upload failed: " + uploadError.message);
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("materials").getPublicUrl(filePath);
+    const newUrls = [...(editSession.file_urls ?? []), urlData.publicUrl];
+    setEditSession({ ...editSession, file_urls: newUrls });
+    toast.success("File uploaded");
+    setUploading(false);
+  };
+
+  const removeFile = async (index: number) => {
+    if (!editSession?.file_urls) return;
+    const url = editSession.file_urls[index];
+    // Extract path from URL
+    const pathMatch = url.split("/storage/v1/object/public/materials/")[1];
+    if (pathMatch) {
+      await supabase.storage.from("materials").remove([decodeURIComponent(pathMatch)]);
+    }
+    const newUrls = editSession.file_urls.filter((_, i) => i !== index);
+    setEditSession({ ...editSession, file_urls: newUrls });
+    toast.success("File removed");
+  };
+
   const saveSession = async () => {
     if (!editSession) return;
     const { error } = await supabase.from("sessions").update({
       bible_study_content: editSession.bible_study_content,
       breakout_notes: editSession.breakout_notes,
       is_locked: editSession.is_locked,
+      file_urls: editSession.file_urls,
     }).eq("id", editSession.id);
     if (error) toast.error("Failed to save");
     else {
@@ -207,6 +249,45 @@ export default function Admin() {
                       value={editSession.breakout_notes ?? ""}
                       onChange={e => setEditSession({ ...editSession, breakout_notes: e.target.value })}
                     />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">PDF Materials</label>
+                    <div className="space-y-2">
+                      {editSession.file_urls?.map((url, i) => {
+                        const fileName = decodeURIComponent(url.split("/").pop() ?? `File ${i + 1}`).replace(/^\d+-/, "");
+                        return (
+                          <div key={i} className="flex items-center gap-2 rounded-lg border px-3 py-2">
+                            <FileText className="h-4 w-4 text-primary shrink-0" />
+                            <a href={url} target="_blank" rel="noopener noreferrer" className="flex-1 truncate text-sm text-primary hover:underline">
+                              {fileName}
+                            </a>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeFile(i)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadFile(file);
+                          e.target.value = "";
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={uploading}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                        {uploading ? "Uploading…" : "Upload PDF"}
+                      </Button>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
