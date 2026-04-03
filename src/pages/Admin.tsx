@@ -250,6 +250,45 @@ export default function Admin() {
                       onChange={e => setEditSession({ ...editSession, breakout_notes: e.target.value })}
                     />
                   </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">PDF Materials</label>
+                    <div className="space-y-2">
+                      {editSession.file_urls?.map((url, i) => {
+                        const fileName = decodeURIComponent(url.split("/").pop() ?? `File ${i + 1}`).replace(/^\d+-/, "");
+                        return (
+                          <div key={i} className="flex items-center gap-2 rounded-lg border px-3 py-2">
+                            <FileText className="h-4 w-4 text-primary shrink-0" />
+                            <a href={url} target="_blank" rel="noopener noreferrer" className="flex-1 truncate text-sm text-primary hover:underline">
+                              {fileName}
+                            </a>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeFile(i)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="application/pdf"
+                        className="hidden"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadFile(file);
+                          e.target.value = "";
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={uploading}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                        {uploading ? "Uploading…" : "Upload PDF"}
+                      </Button>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
