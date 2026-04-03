@@ -91,12 +91,51 @@ export default function Admin() {
     }
   };
 
+  const uploadFile = async (file: File) => {
+    if (!editSession) return;
+    if (file.type !== "application/pdf") {
+      toast.error("Only PDF files are allowed");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File must be under 10MB");
+      return;
+    }
+    setUploading(true);
+    const filePath = `month-${editSession.month}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("materials").upload(filePath, file);
+    if (uploadError) {
+      toast.error("Upload failed: " + uploadError.message);
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("materials").getPublicUrl(filePath);
+    const newUrls = [...(editSession.file_urls ?? []), urlData.publicUrl];
+    setEditSession({ ...editSession, file_urls: newUrls });
+    toast.success("File uploaded");
+    setUploading(false);
+  };
+
+  const removeFile = async (index: number) => {
+    if (!editSession?.file_urls) return;
+    const url = editSession.file_urls[index];
+    // Extract path from URL
+    const pathMatch = url.split("/storage/v1/object/public/materials/")[1];
+    if (pathMatch) {
+      await supabase.storage.from("materials").remove([decodeURIComponent(pathMatch)]);
+    }
+    const newUrls = editSession.file_urls.filter((_, i) => i !== index);
+    setEditSession({ ...editSession, file_urls: newUrls });
+    toast.success("File removed");
+  };
+
   const saveSession = async () => {
     if (!editSession) return;
     const { error } = await supabase.from("sessions").update({
       bible_study_content: editSession.bible_study_content,
       breakout_notes: editSession.breakout_notes,
       is_locked: editSession.is_locked,
+      file_urls: editSession.file_urls,
     }).eq("id", editSession.id);
     if (error) toast.error("Failed to save");
     else {
