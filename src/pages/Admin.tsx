@@ -29,6 +29,7 @@ interface SessionData {
   title: string;
   bible_study_content: string | null;
   breakout_notes: string | null;
+  file_urls: string[] | null;
   is_locked: boolean;
 }
 
