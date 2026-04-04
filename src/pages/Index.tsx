@@ -42,7 +42,7 @@ export default function Index() {
             Path to Godly Marriage
           </h1>
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-sage animate-fade-up delay-200">
-            A 12-month program equipping couples and singles with biblical principles
+            A 12-month program equipping singles with biblical principles
             for building lasting, God-honoring relationships.
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center animate-fade-up delay-300">
