@@ -112,8 +112,15 @@ export default function Admin() {
     }
     const { data: urlData } = supabase.storage.from("materials").getPublicUrl(filePath);
     const newUrls = [...(editSession.file_urls ?? []), urlData.publicUrl];
-    setEditSession({ ...editSession, file_urls: newUrls });
-    toast.success("File uploaded");
+    // Auto-save file_urls to database immediately
+    const { error: saveError } = await supabase.from("sessions").update({ file_urls: newUrls }).eq("id", editSession.id);
+    if (saveError) {
+      toast.error("Failed to save file URL");
+    } else {
+      setEditSession({ ...editSession, file_urls: newUrls });
+      fetchSessions();
+      toast.success("File uploaded and saved");
+    }
     setUploading(false);
   };
 
@@ -126,8 +133,15 @@ export default function Admin() {
       await supabase.storage.from("materials").remove([decodeURIComponent(pathMatch)]);
     }
     const newUrls = editSession.file_urls.filter((_, i) => i !== index);
-    setEditSession({ ...editSession, file_urls: newUrls });
-    toast.success("File removed");
+    // Auto-save file_urls to database immediately
+    const { error: saveError } = await supabase.from("sessions").update({ file_urls: newUrls }).eq("id", editSession.id);
+    if (saveError) {
+      toast.error("Failed to update files");
+    } else {
+      setEditSession({ ...editSession, file_urls: newUrls });
+      fetchSessions();
+      toast.success("File removed");
+    }
   };
 
   const saveSession = async () => {
