@@ -12,10 +12,11 @@ interface Session {
   id: string;
   month: number;
   title: string;
+  is_locked: boolean;
 }
 
 export default function Attendance() {
-  const { user, loading } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [attended, setAttended] = useState<Set<string>>(new Set());
@@ -28,7 +29,7 @@ export default function Attendance() {
   useEffect(() => {
     supabase
       .from("sessions")
-      .select("id, month, title")
+      .select("id, month, title, is_locked")
       .order("month")
       .then(({ data }) => setSessions((data as Session[]) ?? []));
   }, []);
@@ -70,12 +71,13 @@ export default function Attendance() {
       <div className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-8 animate-fade-up">
           <h1 className="mb-2 text-3xl text-foreground">Attendance</h1>
-          <p className="text-muted-foreground">Mark your attendance for each monthly session.</p>
+          <p className="text-muted-foreground">Mark your attendance for each contact session as it is opened.</p>
         </div>
 
         <div className="space-y-3">
           {sessions.map((s, i) => {
             const done = attended.has(s.id);
+            const canMark = isAdmin || !s.is_locked;
             return (
               <Card
                 key={s.id}
@@ -90,11 +92,16 @@ export default function Attendance() {
                       <Circle className="h-5 w-5 text-muted-foreground" />
                     )}
                     <div>
-                      <p className="font-medium text-foreground">Month {s.month}</p>
+                      <p className="font-medium text-foreground">
+                        Contact {s.month}
+                        {s.is_locked && (
+                          <span className="ml-2 text-xs text-muted-foreground">🔒 Locked</span>
+                        )}
+                      </p>
                       <p className="text-sm text-muted-foreground">{s.title}</p>
                     </div>
                   </div>
-                  {!done && (
+                  {!done && canMark && (
                     <Button
                       size="sm"
                       variant="outline"
