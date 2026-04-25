@@ -6,6 +6,7 @@ import { PageLayout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Circle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 interface Session {
@@ -21,6 +22,7 @@ export default function Attendance() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [attended, setAttended] = useState<Set<string>>(new Set());
   const [marking, setMarking] = useState<string | null>(null);
+  const [togglingLock, setTogglingLock] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
@@ -66,6 +68,23 @@ export default function Attendance() {
     }
   };
 
+  const toggleLock = async (sessionId: string, currentlyLocked: boolean) => {
+    setTogglingLock(sessionId);
+    const { error } = await supabase
+      .from("sessions")
+      .update({ is_locked: !currentlyLocked })
+      .eq("id", sessionId);
+    setTogglingLock(null);
+    if (error) {
+      toast.error("Failed to update lock status.");
+    } else {
+      setSessions((prev) =>
+        prev.map((s) => (s.id === sessionId ? { ...s, is_locked: !currentlyLocked } : s)),
+      );
+      toast.success(!currentlyLocked ? "Contact locked." : "Contact unlocked.");
+    }
+  };
+
   return (
     <PageLayout>
       <div className="mx-auto max-w-3xl px-4 py-10">
@@ -101,16 +120,31 @@ export default function Attendance() {
                       <p className="text-sm text-muted-foreground">{s.title}</p>
                     </div>
                   </div>
-                  {!done && canMark && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={marking === s.id}
-                      onClick={() => markAttendance(s.id)}
-                    >
-                      {marking === s.id ? "Marking…" : "Mark"}
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-4">
+                    {isAdmin && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {s.is_locked ? "Locked" : "Unlocked"}
+                        </span>
+                        <Switch
+                          checked={!s.is_locked}
+                          disabled={togglingLock === s.id}
+                          onCheckedChange={() => toggleLock(s.id, s.is_locked)}
+                          aria-label="Toggle contact lock"
+                        />
+                      </div>
+                    )}
+                    {!done && canMark && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={marking === s.id}
+                        onClick={() => markAttendance(s.id)}
+                      >
+                        {marking === s.id ? "Marking…" : "Mark"}
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );
