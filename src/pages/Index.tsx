@@ -2,6 +2,7 @@ import { PageLayout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Users, CheckCircle, Search, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 const features = [
   {
@@ -22,12 +23,13 @@ const features = [
   {
     icon: Search,
     title: "Public Verification",
-    desc: "Anyone can verify a participant's enrollment using their Registration ID.",
+    desc: "Admins can verify a participant's enrollment using their Registration ID.",
   },
 ];
 
 export default function Index() {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   return (
     <PageLayout>
@@ -53,14 +55,16 @@ export default function Index() {
             >
               Register Now <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-sage/30 text-primary-foreground hover:bg-primary-foreground/10"
-              onClick={() => navigate("/verify")}
-            >
-              Verify a Participant
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-sage/30 text-primary-foreground hover:bg-primary-foreground/10"
+                onClick={() => navigate("/verify")}
+              >
+                Verify a Participant
+              </Button>
+            )}
           </div>
         </div>
       </section>
