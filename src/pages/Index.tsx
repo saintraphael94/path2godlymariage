@@ -51,7 +51,7 @@ export default function Index() {
               className="bg-gold text-foreground hover:bg-gold/90 active:scale-[0.97] transition-all"
               onClick={() => navigate("/register")}
             >
-              Begin Your Journey <ArrowRight className="ml-2 h-4 w-4" />
+              Register Now <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button
               variant="outline"
