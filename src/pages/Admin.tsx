@@ -110,8 +110,8 @@ export default function Admin() {
       setUploading(false);
       return;
     }
-    const { data: urlData } = supabase.storage.from("materials").getPublicUrl(filePath);
-    const newUrls = [...(editSession.file_urls ?? []), urlData.publicUrl];
+    // Store the storage path; we generate short-lived signed URLs on demand
+    const newUrls = [...(editSession.file_urls ?? []), filePath];
     // Auto-save file_urls to database immediately
     const { error: saveError } = await supabase.from("sessions").update({ file_urls: newUrls }).eq("id", editSession.id);
     if (saveError) {
