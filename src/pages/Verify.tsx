@@ -25,15 +25,13 @@ export default function Verify() {
     setResult(null);
     setNotFound(false);
 
-    const { data } = await supabase
-      .from("profiles")
-      .select("name, status, batch_year")
-      .eq("registration_id", regId.trim().toUpperCase())
-      .single();
+    const { data, error } = await supabase.functions.invoke("verify-registration", {
+      body: { registration_id: regId.trim().toUpperCase() },
+    });
 
     setLoading(false);
-    if (data) {
-      setResult(data as VerifyResult);
+    if (!error && data?.result) {
+      setResult(data.result as VerifyResult);
     } else {
       setNotFound(true);
     }

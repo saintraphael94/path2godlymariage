@@ -19,27 +19,30 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    // If input looks like a registration ID, look up email
-    let loginEmail = email;
     if (email.toUpperCase().startsWith("P2GM-")) {
-      const { data } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("registration_id", email.toUpperCase())
-        .single();
-      if (data) {
-        loginEmail = data.email;
-      } else {
-        toast.error("Registration ID not found.");
+      // Use edge function so the profiles email is never exposed to the client
+      const { data, error } = await supabase.functions.invoke("login-with-registration", {
+        body: { registration_id: email.toUpperCase(), password },
+      });
+      if (error || !data?.access_token || !data?.refresh_token) {
         setLoading(false);
+        toast.error("Invalid credentials.");
         return;
       }
+      const { error: setErr } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      });
+      setLoading(false);
+      if (setErr) {
+        toast.error(setErr.message);
+      } else {
+        navigate("/dashboard");
+      }
+      return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       toast.error(error.message);

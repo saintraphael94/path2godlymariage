@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Users, BookOpen, CheckSquare, Download, Upload, FileText, Trash2, Loader2 } from "lucide-react";
+import { fileNameFromMaterial, getMaterialSignedUrl, toMaterialsPath } from "@/lib/materials";
 
 interface Profile {
   id: string;
@@ -110,8 +111,8 @@ export default function Admin() {
       setUploading(false);
       return;
     }
-    const { data: urlData } = supabase.storage.from("materials").getPublicUrl(filePath);
-    const newUrls = [...(editSession.file_urls ?? []), urlData.publicUrl];
+    // Store the storage path; we generate short-lived signed URLs on demand
+    const newUrls = [...(editSession.file_urls ?? []), filePath];
     // Auto-save file_urls to database immediately
     const { error: saveError } = await supabase.from("sessions").update({ file_urls: newUrls }).eq("id", editSession.id);
     if (saveError) {
@@ -126,11 +127,9 @@ export default function Admin() {
 
   const removeFile = async (index: number) => {
     if (!editSession?.file_urls) return;
-    const url = editSession.file_urls[index];
-    // Extract path from URL
-    const pathMatch = url.split("/storage/v1/object/public/materials/")[1];
-    if (pathMatch) {
-      await supabase.storage.from("materials").remove([decodeURIComponent(pathMatch)]);
+    const path = toMaterialsPath(editSession.file_urls[index]);
+    if (path) {
+      await supabase.storage.from("materials").remove([path]);
     }
     const newUrls = editSession.file_urls.filter((_, i) => i !== index);
     // Auto-save file_urls to database immediately
@@ -268,13 +267,21 @@ export default function Admin() {
                     <label className="mb-1 block text-sm font-medium text-foreground">PDF Materials</label>
                     <div className="space-y-2">
                       {editSession.file_urls?.map((url, i) => {
-                        const fileName = decodeURIComponent(url.split("/").pop() ?? `File ${i + 1}`).replace(/^\d+-/, "");
+                        const fileName = fileNameFromMaterial(url);
                         return (
                           <div key={i} className="flex items-center gap-2 rounded-lg border px-3 py-2">
                             <FileText className="h-4 w-4 text-primary shrink-0" />
-                            <a href={url} target="_blank" rel="noopener noreferrer" className="flex-1 truncate text-sm text-primary hover:underline">
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const signed = await getMaterialSignedUrl(url);
+                                if (signed) window.open(signed, "_blank", "noopener,noreferrer");
+                                else toast.error("Could not open file");
+                              }}
+                              className="flex-1 truncate text-left text-sm text-primary hover:underline"
+                            >
                               {fileName}
-                            </a>
+                            </button>
                             <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeFile(i)}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
