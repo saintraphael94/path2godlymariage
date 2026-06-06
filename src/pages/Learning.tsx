@@ -157,20 +157,23 @@ export default function Learning() {
                         </h3>
                         <div className="space-y-2">
                           {selected.file_urls.map((url, i) => {
-                            const fileName = decodeURIComponent(url.split("/").pop() ?? `File ${i + 1}`).replace(/^\d+-/, "");
+                            const fileName = fileNameFromMaterial(url);
                             return (
-                              <a
+                              <button
                                 key={i}
-                                href={`${url}?download=`}
-                                download={fileName}
-                                className="flex items-center gap-3 rounded-lg border px-4 py-3 text-sm text-primary hover:bg-secondary transition-colors"
+                                type="button"
+                                onClick={async () => {
+                                  const signed = await getMaterialSignedUrl(url);
+                                  if (signed) window.open(signed, "_blank", "noopener,noreferrer");
+                                }}
+                                className="flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm text-primary hover:bg-secondary transition-colors"
                               >
                                 <span className="inline-flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                 </span>
                                 <span className="flex-1 truncate font-medium">{fileName}</span>
                                 <span className="shrink-0 text-xs text-muted-foreground">⬇ Download</span>
-                              </a>
+                              </button>
                             );
                           })}
                         </div>
