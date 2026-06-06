@@ -81,7 +81,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-foreground">{profile.batch_year}</p>
+              <p className="text-2xl font-bold text-foreground">{profile.batch_year}/{profile.batch_year + 1}</p>
             </CardContent>
           </Card>
         </div>

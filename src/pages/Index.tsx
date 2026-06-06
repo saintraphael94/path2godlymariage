@@ -7,23 +7,23 @@ import { useAuth } from "@/lib/auth-context";
 const features = [
   {
     icon: BookOpen,
-    title: "12-Month Curriculum",
-    desc: "Structured monthly sessions covering every aspect of building a godly marriage.",
+    title: "12 Contacts",
+    desc: "Structured monthly sessions and activities aimed at a building a godly marriage.",
   },
   {
     icon: Users,
-    title: "Community Learning",
-    desc: "Bible study outlines and breakout sessions designed for group engagement.",
+    title: "Practical Life Sessions",
+    desc: "Bible Study, Professional and breakout sessions designed for group engagements.",
   },
   {
     icon: CheckCircle,
-    title: "Track Your Journey",
-    desc: "Mark attendance and monitor your progress through each month of the program.",
+    title: "Like Minds",
+    desc: "People desiring God and a godly marriage that fulfils God's purpose.",
   },
   {
     icon: Search,
-    title: "Public Verification",
-    desc: "Admins can verify a participant's enrollment using their Registration ID.",
+    title: "Biblical Discipleship",
+    desc: "One-on-One Training and examples of Christian marriages to relate with.",
   },
 ];
 
@@ -72,9 +72,9 @@ export default function Index() {
       <section className="px-4 py-20 md:py-28">
         <div className="mx-auto max-w-5xl">
           <div className="mb-16 text-center animate-fade-up">
-            <h2 className="mb-3 text-3xl text-foreground md:text-4xl">How the Program Works</h2>
+            <h2 className="mb-3 text-3xl text-foreground md:text-4xl">Your 12 Months journey</h2>
             <p className="mx-auto max-w-lg text-muted-foreground">
-              Everything you need to grow spiritually and prepare for covenant, all in one place.
+              What the program is made up of
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
@@ -100,7 +100,7 @@ export default function Index() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mb-4 text-3xl text-foreground">Ready to Start?</h2>
           <p className="mb-8 text-muted-foreground">
-            Join hundreds of participants who are investing in their future marriages through God's Word.
+            Join thousands of participants who are investing in their future marriages through God's Word.
           </p>
           <Button
             size="lg"
