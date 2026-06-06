@@ -6,6 +6,7 @@ import { PageLayout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Lock, BookOpen, FileText, Users } from "lucide-react";
+import { fileNameFromMaterial, getMaterialSignedUrl } from "@/lib/materials";
 
 interface Session {
   id: string;
