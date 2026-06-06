@@ -8,7 +8,7 @@ const features = [
   {
     icon: BookOpen,
     title: "12 Contacts",
-    desc: "Structured monthly sessions and activities aimed at a building a godly marriage.",
+    desc: "Structured monthly sessions and activities aimed at building a godly marriage.",
   },
   {
     icon: Users,
