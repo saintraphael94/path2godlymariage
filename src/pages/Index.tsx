@@ -44,7 +44,7 @@ export default function Index() {
             Path to Godly Marriage
           </h1>
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-sage animate-fade-up delay-200">
-            A 12 months program preparing Christian Singles for a godly marriage according to Biblical principles.
+            A 12 months program preparing Christian Singles for a godly marriage according to Biblical principles
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center animate-fade-up delay-300">
             <Button
