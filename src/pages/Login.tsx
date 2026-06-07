@@ -19,7 +19,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    if (email.toUpperCase().startsWith("P2GM-")) {
+    if (email.toUpperCase().startsWith("P2GM/") || email.toUpperCase().startsWith("P2GM-")) {
       // Use edge function so the profiles email is never exposed to the client
       const { data, error } = await supabase.functions.invoke("login-with-registration", {
         body: { registration_id: email.toUpperCase(), password },
