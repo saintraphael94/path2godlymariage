@@ -84,7 +84,6 @@ export default function Register() {
             <Input id="password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} />
           </div>
           <div>
-            <Label htmlFor="phone">Phone</Label>
             <Label htmlFor="phone">Phone *</Label>
             <Input id="phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
           </div>
