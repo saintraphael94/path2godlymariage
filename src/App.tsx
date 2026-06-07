@@ -12,6 +12,7 @@ import Learning from "./pages/Learning";
 import Attendance from "./pages/Attendance";
 import Verify from "./pages/Verify";
 import Admin from "./pages/Admin";
+import AdmissionLetter from "./pages/AdmissionLetter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/admission-letter" element={<AdmissionLetter />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
