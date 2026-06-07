@@ -18,11 +18,22 @@ export default function Register() {
     phone: "",
     gender: "",
     church: "",
+    residential_location: "",
+    attendance_mode: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) {
+    if (
+      !form.name ||
+      !form.email ||
+      !form.password ||
+      !form.phone ||
+      !form.gender ||
+      !form.church ||
+      !form.residential_location ||
+      !form.attendance_mode
+    ) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -36,6 +47,8 @@ export default function Register() {
           phone: form.phone,
           gender: form.gender,
           church: form.church,
+          residential_location: form.residential_location,
+          attendance_mode: form.attendance_mode,
         },
         emailRedirectTo: window.location.origin,
       },
@@ -71,12 +84,12 @@ export default function Register() {
             <Input id="password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={6} />
           </div>
           <div>
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <Label htmlFor="phone">Phone *</Label>
+            <Input id="phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
           </div>
           <div>
-            <Label>Gender</Label>
-            <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
+            <Label>Gender *</Label>
+            <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })} required>
               <SelectTrigger><SelectValue placeholder="Select gender" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="male">Male</SelectItem>
@@ -85,8 +98,28 @@ export default function Register() {
             </Select>
           </div>
           <div>
-            <Label htmlFor="church">Church (optional)</Label>
-            <Input id="church" value={form.church} onChange={(e) => setForm({ ...form, church: e.target.value })} />
+            <Label htmlFor="church">Church *</Label>
+            <Input id="church" value={form.church} onChange={(e) => setForm({ ...form, church: e.target.value })} required />
+          </div>
+          <div>
+            <Label htmlFor="residential_location">Residential Location *</Label>
+            <Input
+              id="residential_location"
+              value={form.residential_location}
+              onChange={(e) => setForm({ ...form, residential_location: e.target.value })}
+              placeholder="City, State / Country"
+              required
+            />
+          </div>
+          <div>
+            <Label>Will you be joining online or onsite? *</Label>
+            <Select value={form.attendance_mode} onValueChange={(v) => setForm({ ...form, attendance_mode: v })} required>
+              <SelectTrigger><SelectValue placeholder="Select option" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="online">Online</SelectItem>
+                <SelectItem value="onsite">Onsite</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
