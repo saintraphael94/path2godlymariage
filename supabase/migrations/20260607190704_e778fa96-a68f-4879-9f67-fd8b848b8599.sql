@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.generate_registration_id() FROM PUBLIC, anon, authenticated;

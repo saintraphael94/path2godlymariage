@@ -49,7 +49,7 @@ export default function Verify() {
 
         <form onSubmit={handleVerify} className="mb-6 flex gap-2 animate-fade-up delay-100">
           <Input
-            placeholder="P2GM-2026-0001"
+            placeholder="P2GM/2627/00001"
             value={regId}
             onChange={(e) => setRegId(e.target.value)}
             className="font-mono"
