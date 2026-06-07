@@ -1,27 +1,27 @@
 import { PageLayout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Users, CheckCircle, Search, ArrowRight } from "lucide-react";
+import { CalendarDays, Presentation, HeartHandshake, GraduationCap, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 const features = [
   {
-    icon: BookOpen,
+    icon: CalendarDays,
     title: "12 Contacts",
     desc: "Structured monthly sessions and activities aimed at building a godly marriage.",
   },
   {
-    icon: Users,
+    icon: Presentation,
     title: "Practical Life Sessions",
     desc: "Bible Study, Professional and breakout sessions designed for group engagements.",
   },
   {
-    icon: CheckCircle,
+    icon: HeartHandshake,
     title: "Like Minds",
     desc: "People desiring God and a godly marriage that fulfils God's purpose.",
   },
   {
-    icon: Search,
+    icon: GraduationCap,
     title: "Biblical Discipleship",
     desc: "One-on-One Training and examples of Christian marriages to relate with.",
   },
