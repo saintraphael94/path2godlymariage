@@ -45,6 +45,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          attendance_mode: string | null
           batch_year: number
           church: string | null
           created_at: string
@@ -54,11 +55,13 @@ export type Database = {
           name: string
           phone: string | null
           registration_id: string
+          residential_location: string | null
           status: Database["public"]["Enums"]["user_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          attendance_mode?: string | null
           batch_year?: number
           church?: string | null
           created_at?: string
@@ -68,11 +71,13 @@ export type Database = {
           name: string
           phone?: string | null
           registration_id: string
+          residential_location?: string | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          attendance_mode?: string | null
           batch_year?: number
           church?: string | null
           created_at?: string
@@ -82,6 +87,7 @@ export type Database = {
           name?: string
           phone?: string | null
           registration_id?: string
+          residential_location?: string | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
           user_id?: string
