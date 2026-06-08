@@ -13,6 +13,8 @@ import Attendance from "./pages/Attendance";
 import Verify from "./pages/Verify";
 import Admin from "./pages/Admin";
 import AdmissionLetter from "./pages/AdmissionLetter";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/verify" element={<Verify />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admission-letter" element={<AdmissionLetter />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

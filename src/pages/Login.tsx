@@ -97,10 +97,14 @@ export default function Login() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Don't have an account?{" "}
-          <Link to="/register" className="font-medium text-primary hover:underline">Register</Link>
-        </p>
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <Link to="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
+            Forgot password?
+          </Link>
+          <Link to="/register" className="font-medium text-primary hover:underline">
+            Register
+          </Link>
+        </div>
       </div>
     </PageLayout>
   );
