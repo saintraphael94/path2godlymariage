@@ -31,7 +31,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
           <img src={logoAsset.url} alt="Luke One Seventeen Mission" className="h-10 w-auto object-contain" />
-          <span className="hidden sm:inline text-base font-bold text-forest" style={{ fontFamily: "'DM Serif Display', serif" }}>
+          <span className="hidden sm:inline text-3xl font-bold text-forest" style={{ fontFamily: "'DM Serif Display', serif" }}>
             Luke One Seventeen Mission
           </span>
         </Link>
