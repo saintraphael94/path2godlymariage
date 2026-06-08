@@ -36,6 +36,8 @@ const App = () => (
             <Route path="/verify" element={<Verify />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admission-letter" element={<AdmissionLetter />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
