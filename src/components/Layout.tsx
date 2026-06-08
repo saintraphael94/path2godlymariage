@@ -3,6 +3,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, X, BookOpen, User, CheckSquare, Shield } from "lucide-react";
 import { useState } from "react";
+import logoAsset from "@/assets/luke117-logo.jpg.asset.json";
 
 export function Navbar() {
   const { user, profile, isAdmin, signOut } = useAuth();
@@ -29,11 +30,9 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b bg-warm-white/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest">
-            <BookOpen className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold text-forest" style={{ fontFamily: "'DM Serif Display', serif" }}>
-            P2GM
+          <img src={logoAsset.url} alt="Luke One Seventeen Mission" className="h-10 w-auto object-contain" />
+          <span className="hidden sm:inline text-base font-bold text-forest" style={{ fontFamily: "'DM Serif Display', serif" }}>
+            Luke One Seventeen Mission
           </span>
         </Link>
 
