@@ -13,6 +13,8 @@ import Attendance from "./pages/Attendance";
 import Verify from "./pages/Verify";
 import Admin from "./pages/Admin";
 import AdmissionLetter from "./pages/AdmissionLetter";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
