@@ -67,7 +67,7 @@ export default function Verify() {
               <h2 className="mb-1 text-xl font-semibold text-foreground" style={{ fontFamily: "'DM Serif Display', serif" }}>
                 {result.name}
               </h2>
-              <p className="mb-2 text-sm text-muted-foreground">Batch {result.batch_year}</p>
+              <p className="mb-2 text-sm text-muted-foreground">Batch {result.batch_year}/{String(result.batch_year + 1).slice(-2)}</p>
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${result.status === "active" ? "bg-green-100 text-green-800" : "bg-gold-light text-gold"}`}>
                 {result.status === "active" ? "Active" : "Completed"}
               </span>

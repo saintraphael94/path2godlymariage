@@ -215,7 +215,7 @@ export default function Admin() {
                         <TableCell className="font-medium">{u.name}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
                         <TableCell className="font-mono text-xs">{u.registration_id}</TableCell>
-                        <TableCell>{u.batch_year}</TableCell>
+                        <TableCell>{u.batch_year}/{String(u.batch_year + 1).slice(-2)}</TableCell>
                         <TableCell>
                           <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.status === "active" ? "bg-green-100 text-green-800" : "bg-gold-light text-gold"}`}>
                             {u.status}
