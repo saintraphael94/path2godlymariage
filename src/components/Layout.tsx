@@ -30,10 +30,10 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b bg-warm-white/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logoAsset.url} alt="Luke One Seventeen Mission" className="h-10 w-auto object-contain" />
           <span className="hidden sm:inline text-lg font-bold text-forest" style={{ fontFamily: "'DM Serif Display', serif" }}>
-            Luke One Seventeen Mission
+            P2GM
           </span>
+          <img src={logoAsset.url} alt="P2GM" className="h-10 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav */}
