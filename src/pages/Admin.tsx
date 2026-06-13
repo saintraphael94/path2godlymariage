@@ -81,11 +81,32 @@ export default function Admin() {
   };
 
   const fetchAttendance = async () => {
-    const { data } = await supabase
+    const { data: attRows, error } = await supabase
       .from("attendance")
-      .select("*, profiles(name, registration_id), sessions(month, title)")
+      .select("*")
       .order("marked_at", { ascending: false });
-    setAttendance((data as unknown as AttendanceRow[]) ?? []);
+    if (error || !attRows) {
+      setAttendance([]);
+      return;
+    }
+    const userIds = Array.from(new Set(attRows.map((a: any) => a.user_id)));
+    const sessionIds = Array.from(new Set(attRows.map((a: any) => a.session_id)));
+    const [{ data: profs }, { data: sess }] = await Promise.all([
+      supabase.from("profiles").select("user_id, name, registration_id").in("user_id", userIds),
+      supabase.from("sessions").select("id, month, title").in("id", sessionIds),
+    ]);
+    const profMap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
+    const sessMap = new Map((sess ?? []).map((s: any) => [s.id, s]));
+    const merged = attRows.map((a: any) => ({
+      ...a,
+      profiles: profMap.get(a.user_id)
+        ? { name: (profMap.get(a.user_id) as any).name, registration_id: (profMap.get(a.user_id) as any).registration_id }
+        : null,
+      sessions: sessMap.get(a.session_id)
+        ? { month: (sessMap.get(a.session_id) as any).month, title: (sessMap.get(a.session_id) as any).title }
+        : null,
+    }));
+    setAttendance(merged as AttendanceRow[]);
   };
 
   const fetchRegistrationSetting = async () => {
