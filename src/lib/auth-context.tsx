@@ -50,17 +50,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           setTimeout(async () => {
-            const { data: profileData } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("user_id", session.user.id)
-              .single();
+            const [{ data: profileData }, { data: roleData }] = await Promise.all([
+              supabase
+                .from("profiles")
+                .select("*")
+                .eq("user_id", session.user.id)
+                .single(),
+              supabase
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", session.user.id),
+            ]);
             setProfile(profileData as Profile | null);
-
-            const { data: roleData } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", session.user.id);
             setIsAdmin(roleData?.some((r) => r.role === "admin") ?? false);
             setLoading(false);
           }, 0);
