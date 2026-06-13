@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/Layout";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,8 +23,23 @@ export default function Register() {
     attendance_mode: "",
   });
 
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "registration_open")
+        .maybeSingle();
+      setRegistrationOpen(data?.value === true || data?.value === "true");
+    })();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (registrationOpen === false) {
+      toast.error("Registration is currently closed.");
+      return;
+    }
     if (
       !form.name ||
       !form.email ||
@@ -61,6 +77,23 @@ export default function Register() {
       navigate("/login");
     }
   };
+
+  if (registrationOpen === false) {
+    return (
+      <PageLayout>
+        <div className="mx-auto max-w-md px-4 py-20 text-center animate-fade-up">
+          <h1 className="mb-3 text-3xl text-foreground">Registration Closed</h1>
+          <p className="text-muted-foreground">
+            Registration for the P2GM program is currently closed. Please check back later
+            or contact the administrators for more information.
+          </p>
+          <Link to="/" className="mt-6 inline-block font-medium text-primary hover:underline">
+            Back to Home
+          </Link>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>
