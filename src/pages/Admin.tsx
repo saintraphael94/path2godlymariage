@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Users, BookOpen, CheckSquare, Download, Upload, FileText, Trash2, Loader2 } from "lucide-react";
 import { fileNameFromMaterial, getMaterialSignedUrl, toMaterialsPath } from "@/lib/materials";
@@ -52,6 +53,8 @@ export default function Admin() {
   const [editSession, setEditSession] = useState<SessionData | null>(null);
   const [filterMonth, setFilterMonth] = useState<string>("all");
   const [uploading, setUploading] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState<boolean>(true);
+  const [savingRegToggle, setSavingRegToggle] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -63,6 +66,7 @@ export default function Admin() {
       fetchUsers();
       fetchSessions();
       fetchAttendance();
+      fetchRegistrationSetting();
     }
   }, [isAdmin]);
 
@@ -82,6 +86,29 @@ export default function Admin() {
       .select("*, profiles(name, registration_id), sessions(month, title)")
       .order("marked_at", { ascending: false });
     setAttendance((data as unknown as AttendanceRow[]) ?? []);
+  };
+
+  const fetchRegistrationSetting = async () => {
+    const { data } = await supabase
+      .from("app_settings")
+      .select("value")
+      .eq("key", "registration_open")
+      .maybeSingle();
+    setRegistrationOpen(data?.value === true || data?.value === "true");
+  };
+
+  const toggleRegistration = async (open: boolean) => {
+    setSavingRegToggle(true);
+    const { error } = await supabase
+      .from("app_settings")
+      .upsert({ key: "registration_open", value: open as unknown as any }, { onConflict: "key" });
+    setSavingRegToggle(false);
+    if (error) {
+      toast.error("Failed to update registration status");
+    } else {
+      setRegistrationOpen(open);
+      toast.success(open ? "Registration is now open" : "Registration is now closed");
+    }
   };
 
   const updateUserStatus = async (userId: string, status: "active" | "completed") => {
@@ -193,6 +220,23 @@ export default function Admin() {
           </TabsList>
 
           <TabsContent value="users" className="animate-fade-up">
+            <Card className="mb-4">
+              <CardContent className="flex items-center justify-between p-5">
+                <div>
+                  <h3 className="font-semibold text-foreground">Registration {registrationOpen ? "Open" : "Closed"}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {registrationOpen
+                      ? "New students can currently sign up for the program."
+                      : "New sign-ups are blocked. Existing students are unaffected."}
+                  </p>
+                </div>
+                <Switch
+                  checked={registrationOpen}
+                  disabled={savingRegToggle}
+                  onCheckedChange={toggleRegistration}
+                />
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>All Students ({users.length})</CardTitle>
