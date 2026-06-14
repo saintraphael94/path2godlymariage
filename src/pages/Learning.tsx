@@ -56,16 +56,15 @@ export default function Learning() {
             {sessions.map((s, i) => (
               <Card
                 key={s.id}
-                className={`cursor-pointer transition-all hover:shadow-md animate-fade-up ${s.is_locked ? "opacity-60" : ""}`}
+                className="cursor-pointer transition-all hover:shadow-md animate-fade-up"
                 style={{ animationDelay: `${i * 60}ms` }}
-                onClick={() => !s.is_locked && setSelected(s)}
+                onClick={() => setSelected(s)}
               >
                 <CardContent className="p-5">
                   <div className="mb-3 flex items-center justify-between">
                     <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gold-light text-sm font-bold text-gold">
                       {s.month}
                     </span>
-                    {s.is_locked && <Lock className="h-4 w-4 text-muted-foreground" />}
                   </div>
                   <h3 className="text-sm font-semibold leading-snug text-foreground">{s.title}</h3>
                   <div className="mt-2 flex gap-1.5">
