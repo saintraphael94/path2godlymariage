@@ -38,13 +38,13 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          {navLink("/verify", "Verify")}
           {user ? (
             <>
               {navLink("/dashboard", "Dashboard")}
               {navLink("/learning", "Learning")}
               {navLink("/attendance", "Attendance")}
               {navLink("/admission-letter", "Admission Letter")}
+              {isAdmin && navLink("/verify", "Verify")}
               {isAdmin && navLink("/admin", "Admin")}
               <div className="flex items-center gap-3 border-l pl-4">
                 <span className="text-xs text-muted-foreground">{profile?.registration_id}</span>
@@ -71,13 +71,13 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t bg-warm-white px-4 py-4 md:hidden animate-fade-in">
           <nav className="flex flex-col gap-3">
-            {navLink("/verify", "Verify")}
             {user ? (
               <>
                 {navLink("/dashboard", "Dashboard")}
                 {navLink("/learning", "Learning")}
                 {navLink("/attendance", "Attendance")}
               {navLink("/admission-letter", "Admission Letter")}
+                {isAdmin && navLink("/verify", "Verify")}
                 {isAdmin && navLink("/admin", "Admin")}
                 <Button variant="ghost" size="sm" className="justify-start" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" /> Sign Out
