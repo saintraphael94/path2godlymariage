@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, CheckCircle, XCircle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { Navigate } from "react-router-dom";
 
 interface VerifyResult {
   name: string;
@@ -13,10 +15,15 @@ interface VerifyResult {
 }
 
 export default function Verify() {
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const [regId, setRegId] = useState("");
   const [result, setResult] = useState<VerifyResult | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  if (authLoading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
