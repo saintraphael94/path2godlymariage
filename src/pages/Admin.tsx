@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Users, BookOpen, CheckSquare, Download, Upload, FileText, Trash2, Loader2 } from "lucide-react";
+import { Users, BookOpen, CheckSquare, Download, Upload, FileText, Trash2, Loader2, Link as LinkIcon, Plus } from "lucide-react";
 import { fileNameFromMaterial, getMaterialSignedUrl, toMaterialsPath } from "@/lib/materials";
 
 interface Profile {
@@ -44,6 +44,16 @@ interface AttendanceRow {
   sessions: { month: number; title: string } | null;
 }
 
+type MaterialType = "pdf" | "audio" | "video" | "link";
+interface Material {
+  id: string;
+  title: string;
+  url: string;
+  type: MaterialType;
+  session_month: number;
+  description: string | null;
+}
+
 export default function Admin() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
@@ -57,6 +67,14 @@ export default function Admin() {
   const [savingRegToggle, setSavingRegToggle] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [matTitle, setMatTitle] = useState("");
+  const [matUrl, setMatUrl] = useState("");
+  const [matType, setMatType] = useState<MaterialType>("pdf");
+  const [matMonth, setMatMonth] = useState<string>("1");
+  const [matDesc, setMatDesc] = useState("");
+  const [addingMat, setAddingMat] = useState(false);
+
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) navigate("/dashboard");
   }, [user, isAdmin, loading, navigate]);
@@ -67,6 +85,7 @@ export default function Admin() {
       fetchSessions();
       fetchAttendance();
       fetchRegistrationSetting();
+      fetchMaterials();
     }
   }, [isAdmin]);
 
@@ -116,6 +135,49 @@ export default function Admin() {
       .eq("key", "registration_open")
       .maybeSingle();
     setRegistrationOpen(data?.value === true || data?.value === "true");
+  };
+
+  const fetchMaterials = async () => {
+    const { data } = await supabase.from("materials").select("*").order("session_month").order("created_at", { ascending: false });
+    setMaterials((data as Material[]) ?? []);
+  };
+
+  const addMaterial = async () => {
+    if (!matTitle.trim() || !matUrl.trim()) {
+      toast.error("Title and URL are required");
+      return;
+    }
+    const month = parseInt(matMonth);
+    if (isNaN(month) || month < 1 || month > 12) {
+      toast.error("Session number must be between 1 and 12");
+      return;
+    }
+    setAddingMat(true);
+    const { error } = await supabase.from("materials").insert({
+      title: matTitle.trim(),
+      url: matUrl.trim(),
+      type: matType,
+      session_month: month,
+      description: matDesc.trim() || null,
+      created_by: user?.id ?? null,
+    });
+    setAddingMat(false);
+    if (error) {
+      toast.error("Failed to add material: " + error.message);
+      return;
+    }
+    toast.success("Material added");
+    setMatTitle(""); setMatUrl(""); setMatDesc("");
+    fetchMaterials();
+  };
+
+  const deleteMaterial = async (id: string) => {
+    const { error } = await supabase.from("materials").delete().eq("id", id);
+    if (error) toast.error("Failed to delete");
+    else {
+      toast.success("Material removed");
+      fetchMaterials();
+    }
   };
 
   const toggleRegistration = async (open: boolean) => {
@@ -306,6 +368,72 @@ export default function Admin() {
           </TabsContent>
 
           <TabsContent value="content" className="animate-fade-up">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><LinkIcon className="h-5 w-5" /> Add External Material</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">Title</label>
+                    <Input value={matTitle} onChange={e => setMatTitle(e.target.value)} placeholder="e.g. Culture of Shame" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">URL</label>
+                    <Input value={matUrl} onChange={e => setMatUrl(e.target.value)} placeholder="https://..." />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">Type</label>
+                    <Select value={matType} onValueChange={v => setMatType(v as MaterialType)}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pdf">PDF</SelectItem>
+                        <SelectItem value="audio">Audio</SelectItem>
+                        <SelectItem value="video">Video</SelectItem>
+                        <SelectItem value="link">Link</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-foreground">Session Number (1–12)</label>
+                    <Select value={matMonth} onValueChange={setMatMonth}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 12 }, (_, i) => (
+                          <SelectItem key={i + 1} value={String(i + 1)}>Session {i + 1}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-foreground">Description (optional)</label>
+                  <Input value={matDesc} onChange={e => setMatDesc(e.target.value)} placeholder="Short description" />
+                </div>
+                <Button onClick={addMaterial} disabled={addingMat}>
+                  {addingMat ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+                  Add Material
+                </Button>
+                {materials.length > 0 && (
+                  <div className="space-y-2 pt-2">
+                    {materials.map(m => (
+                      <div key={m.id} className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-semibold text-foreground">{m.title}</div>
+                          <div className="truncate text-xs text-muted-foreground">
+                            {m.type.toUpperCase()} · Session {m.session_month} · {m.url}
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMaterial(m.id)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {editSession ? (
               <Card>
                 <CardHeader>

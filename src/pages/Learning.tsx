@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageLayout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lock, BookOpen, FileText, Users } from "lucide-react";
+import { Lock, BookOpen, FileText, Users, FileText as FileIcon, Headphones, Video, Link as LinkIcon } from "lucide-react";
 import { fileNameFromMaterial, getMaterialSignedUrl } from "@/lib/materials";
 
 interface Session {
@@ -18,11 +18,22 @@ interface Session {
   is_locked: boolean;
 }
 
+type MaterialType = "pdf" | "audio" | "video" | "link";
+interface Material {
+  id: string;
+  title: string;
+  url: string;
+  type: MaterialType;
+  session_month: number;
+  description: string | null;
+}
+
 export default function Learning() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selected, setSelected] = useState<Session | null>(null);
+  const [materials, setMaterials] = useState<Material[]>([]);
 
   useEffect(() => {
     if (!loading && !user) navigate("/login");
@@ -34,13 +45,25 @@ export default function Learning() {
       .select("*")
       .order("month")
       .then(({ data }) => setSessions((data as Session[]) ?? []));
+    supabase
+      .from("materials")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setMaterials((data as Material[]) ?? []));
   }, []);
 
   const hasContent = (s: Session, type: string) => {
     if (type === "bible") return !!s.bible_study_content;
     if (type === "breakout") return !!s.breakout_notes;
-    if (type === "files") return s.file_urls && s.file_urls.length > 0;
+    if (type === "files") return (s.file_urls && s.file_urls.length > 0) || materials.some(m => m.session_month === s.month);
     return false;
+  };
+
+  const iconFor = (t: MaterialType) => {
+    if (t === "pdf") return <FileIcon className="h-4 w-4" />;
+    if (t === "audio") return <Headphones className="h-4 w-4" />;
+    if (t === "video") return <Video className="h-4 w-4" />;
+    return <LinkIcon className="h-4 w-4" />;
   };
 
   return (
@@ -150,13 +173,33 @@ export default function Learning() {
                   </TabsContent>
 
                   <TabsContent value="downloads">
-                    {selected.file_urls && selected.file_urls.length > 0 ? (
-                      <div>
+                    {((selected.file_urls && selected.file_urls.length > 0) || materials.some(m => m.session_month === selected.month)) ? (
+                      <div className="space-y-4">
                         <h3 className="mb-3 text-lg font-semibold text-foreground" style={{ fontFamily: "'DM Serif Display', serif" }}>
-                          📎 Materials & Downloads
+                          Downloadable Materials
                         </h3>
                         <div className="space-y-2">
-                          {selected.file_urls.map((url, i) => {
+                          {materials.filter(m => m.session_month === selected.month).map(m => (
+                            <a
+                              key={m.id}
+                              href={m.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm text-primary hover:bg-secondary transition-colors"
+                            >
+                              <span className="inline-flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-primary">
+                                {iconFor(m.type)}
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate font-semibold uppercase text-foreground">{m.title}</span>
+                                {m.description && (
+                                  <span className="block truncate text-xs text-muted-foreground">{m.description}</span>
+                                )}
+                              </span>
+                              <span className="shrink-0 text-xs uppercase text-muted-foreground">{m.type}</span>
+                            </a>
+                          ))}
+                          {(selected.file_urls ?? []).map((url, i) => {
                             const fileName = fileNameFromMaterial(url);
                             return (
                               <button
