@@ -67,6 +67,42 @@ export type Database = {
           },
         ]
       }
+      materials: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          session_month: number
+          title: string
+          type: Database["public"]["Enums"]["material_type"]
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          session_month: number
+          title: string
+          type: Database["public"]["Enums"]["material_type"]
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          session_month?: number
+          title?: string
+          type?: Database["public"]["Enums"]["material_type"]
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           attendance_mode: string | null
@@ -188,6 +224,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "student"
+      material_type: "pdf" | "audio" | "video" | "link"
       user_status: "active" | "completed"
     }
     CompositeTypes: {
@@ -317,6 +354,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "student"],
+      material_type: ["pdf", "audio", "video", "link"],
       user_status: ["active", "completed"],
     },
   },
