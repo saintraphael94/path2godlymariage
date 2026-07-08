@@ -199,7 +199,7 @@ export default function Learning() {
                               <span className="shrink-0 text-xs uppercase text-muted-foreground">{m.type}</span>
                             </a>
                           ))}
-                          {selected.file_urls.map((url, i) => {
+                          {(selected.file_urls ?? []).map((url, i) => {
                             const fileName = fileNameFromMaterial(url);
                             return (
                               <button
