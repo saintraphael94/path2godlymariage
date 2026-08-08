@@ -124,14 +124,14 @@ export default function Learning() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="bible-study">
-                  <TabsList className="mb-4 w-full justify-start">
-                    <TabsTrigger value="bible-study" className="gap-1.5">
+                  <TabsList className="mb-4 flex h-auto w-full flex-wrap justify-start gap-1">
+                    <TabsTrigger value="bible-study" className="flex-1 min-w-[9rem] gap-1.5">
                       <BookOpen className="h-4 w-4" /> Bible Study
                     </TabsTrigger>
-                    <TabsTrigger value="breakout-notes" className="gap-1.5">
+                    <TabsTrigger value="breakout-notes" className="flex-1 min-w-[9rem] gap-1.5">
                       <Users className="h-4 w-4" /> Session Notes
                     </TabsTrigger>
-                    <TabsTrigger value="downloads" className="gap-1.5">
+                    <TabsTrigger value="downloads" className="flex-1 min-w-[9rem] gap-1.5">
                       <FileText className="h-4 w-4" /> Downloads
                     </TabsTrigger>
                   </TabsList>
