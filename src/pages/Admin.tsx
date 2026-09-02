@@ -87,6 +87,7 @@ export default function Admin() {
       fetchSessions();
       fetchAttendance();
       fetchRegistrationSetting();
+      fetchLoginSetting();
       fetchMaterials();
     }
   }, [isAdmin]);
