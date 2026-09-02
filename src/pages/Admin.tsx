@@ -140,6 +140,15 @@ export default function Admin() {
     setRegistrationOpen(data?.value === true || data?.value === "true");
   };
 
+  const fetchLoginSetting = async () => {
+    const { data } = await supabase
+      .from("app_settings")
+      .select("value")
+      .eq("key", "login_open")
+      .maybeSingle();
+    setLoginOpen(data?.value === undefined ? true : data?.value === true || data?.value === "true");
+  };
+
   const fetchMaterials = async () => {
     const { data } = await supabase.from("materials").select("*").order("session_month").order("created_at", { ascending: false });
     setMaterials((data as Material[]) ?? []);
