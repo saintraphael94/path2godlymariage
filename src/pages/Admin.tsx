@@ -346,6 +346,23 @@ export default function Admin() {
                 />
               </CardContent>
             </Card>
+            <Card className="mb-4">
+              <CardContent className="flex items-center justify-between p-5">
+                <div>
+                  <h3 className="font-semibold text-foreground">Dashboard Login {loginOpen ? "Enabled" : "Disabled"}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {loginOpen
+                      ? "Students and admins can currently sign in to dashboards."
+                      : "Student sign-ins are blocked. Only admins can log in."}
+                  </p>
+                </div>
+                <Switch
+                  checked={loginOpen}
+                  disabled={savingLoginToggle}
+                  onCheckedChange={toggleLogin}
+                />
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader>
                 <CardTitle>All Students ({users.length})</CardTitle>
