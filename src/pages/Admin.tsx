@@ -206,6 +206,20 @@ export default function Admin() {
     }
   };
 
+  const toggleLogin = async (open: boolean) => {
+    setSavingLoginToggle(true);
+    const { error } = await supabase
+      .from("app_settings")
+      .upsert({ key: "login_open", value: open as unknown as any }, { onConflict: "key" });
+    setSavingLoginToggle(false);
+    if (error) {
+      toast.error("Failed to update login status");
+    } else {
+      setLoginOpen(open);
+      toast.success(open ? "Dashboard logins are now enabled" : "Dashboard logins are now disabled for non-admins");
+    }
+  };
+
   const updateUserStatus = async (userId: string, status: "active" | "completed") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("user_id", userId);
     if (error) toast.error("Failed to update status");
