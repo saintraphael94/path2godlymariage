@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           setTimeout(async () => {
-            const [{ data: profileData }, { data: roleData }, { data: setting }] = await Promise.all([
+            const [{ data: profileData }, { data: roleData }] = await Promise.all([
               supabase
                 .from("profiles")
                 .select("*")
@@ -61,25 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 .from("user_roles")
                 .select("role")
                 .eq("user_id", session.user.id),
-              supabase
-                .from("app_settings")
-                .select("value")
-                .eq("key", "login_open")
-                .maybeSingle(),
             ]);
             const admin = roleData?.some((r) => r.role === "admin") ?? false;
-            const loginOpen = setting?.value === undefined ? true : setting.value === true || setting.value === "true";
-
-            if (!loginOpen && !admin) {
-              await supabase.auth.signOut();
-              toast.error("Logins are temporarily disabled. Please check back later.");
-              setProfile(null);
-              setIsAdmin(false);
-              setUser(null);
-              setSession(null);
-              setLoading(false);
-              return;
-            }
 
             setProfile(profileData as Profile | null);
             setIsAdmin(admin);
