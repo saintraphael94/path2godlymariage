@@ -65,8 +65,6 @@ export default function Admin() {
   const [uploading, setUploading] = useState(false);
   const [registrationOpen, setRegistrationOpen] = useState<boolean>(true);
   const [savingRegToggle, setSavingRegToggle] = useState(false);
-  const [loginOpen, setLoginOpen] = useState<boolean>(true);
-  const [savingLoginToggle, setSavingLoginToggle] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [materials, setMaterials] = useState<Material[]>([]);
