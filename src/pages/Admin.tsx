@@ -65,8 +65,6 @@ export default function Admin() {
   const [uploading, setUploading] = useState(false);
   const [registrationOpen, setRegistrationOpen] = useState<boolean>(true);
   const [savingRegToggle, setSavingRegToggle] = useState(false);
-  const [loginOpen, setLoginOpen] = useState<boolean>(true);
-  const [savingLoginToggle, setSavingLoginToggle] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [materials, setMaterials] = useState<Material[]>([]);
@@ -87,7 +85,6 @@ export default function Admin() {
       fetchSessions();
       fetchAttendance();
       fetchRegistrationSetting();
-      fetchLoginSetting();
       fetchMaterials();
     }
   }, [isAdmin]);
@@ -138,15 +135,6 @@ export default function Admin() {
       .eq("key", "registration_open")
       .maybeSingle();
     setRegistrationOpen(data?.value === true || data?.value === "true");
-  };
-
-  const fetchLoginSetting = async () => {
-    const { data } = await supabase
-      .from("app_settings")
-      .select("value")
-      .eq("key", "login_open")
-      .maybeSingle();
-    setLoginOpen(data?.value === undefined ? true : data?.value === true || data?.value === "true");
   };
 
   const fetchMaterials = async () => {
@@ -206,19 +194,6 @@ export default function Admin() {
     }
   };
 
-  const toggleLogin = async (open: boolean) => {
-    setSavingLoginToggle(true);
-    const { error } = await supabase
-      .from("app_settings")
-      .upsert({ key: "login_open", value: open as unknown as any }, { onConflict: "key" });
-    setSavingLoginToggle(false);
-    if (error) {
-      toast.error("Failed to update login status");
-    } else {
-      setLoginOpen(open);
-      toast.success(open ? "Dashboard logins are now enabled" : "Dashboard logins are now disabled for non-admins");
-    }
-  };
 
   const updateUserStatus = async (userId: string, status: "active" | "completed") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("user_id", userId);
@@ -343,23 +318,6 @@ export default function Admin() {
                   checked={registrationOpen}
                   disabled={savingRegToggle}
                   onCheckedChange={toggleRegistration}
-                />
-              </CardContent>
-            </Card>
-            <Card className="mb-4">
-              <CardContent className="flex items-center justify-between p-5">
-                <div>
-                  <h3 className="font-semibold text-foreground">Dashboard Login {loginOpen ? "Enabled" : "Disabled"}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {loginOpen
-                      ? "Students and admins can currently sign in to dashboards."
-                      : "Student sign-ins are blocked. Only admins can log in."}
-                  </p>
-                </div>
-                <Switch
-                  checked={loginOpen}
-                  disabled={savingLoginToggle}
-                  onCheckedChange={toggleLogin}
                 />
               </CardContent>
             </Card>
