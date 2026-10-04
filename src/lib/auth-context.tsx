@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Profile {
   id: string;
@@ -11,7 +12,7 @@ interface Profile {
   gender: string | null;
   church: string | null;
   registration_id: string;
-  status: "active" | "completed";
+  status: "active" | "completed" | "withdrawn";
   batch_year: number;
 }
 
@@ -62,6 +63,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 .eq("user_id", session.user.id),
             ]);
             const admin = roleData?.some((r) => r.role === "admin") ?? false;
+
+            if (!admin && (profileData as Profile | null)?.status === "withdrawn") {
+              await supabase.auth.signOut();
+              setProfile(null);
+              setIsAdmin(false);
+              setLoading(false);
+              toast.error("Your access to the portal has been withdrawn. Please contact the program administrator.");
+              return;
+            }
 
             setProfile(profileData as Profile | null);
             setIsAdmin(admin);
