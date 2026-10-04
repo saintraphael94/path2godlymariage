@@ -195,7 +195,7 @@ export default function Admin() {
   };
 
 
-  const updateUserStatus = async (userId: string, status: "active" | "completed") => {
+  const updateUserStatus = async (userId: string, status: "active" | "completed" | "withdrawn") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("user_id", userId);
     if (error) toast.error("Failed to update status");
     else {
@@ -345,18 +345,19 @@ export default function Admin() {
                         <TableCell className="font-mono text-xs">{u.registration_id}</TableCell>
                         <TableCell>{u.batch_year}/{String(u.batch_year + 1).slice(-2)}</TableCell>
                         <TableCell>
-                          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.status === "active" ? "bg-green-100 text-green-800" : "bg-gold-light text-gold"}`}>
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.status === "active" ? "bg-green-100 text-green-800" : u.status === "withdrawn" ? "bg-destructive/10 text-destructive" : "bg-gold-light text-gold"}`}>
                             {u.status}
                           </span>
                         </TableCell>
                         <TableCell>
-                          <Select value={u.status} onValueChange={v => updateUserStatus(u.user_id, v as "active" | "completed")}>
-                            <SelectTrigger className="h-8 w-28">
+                          <Select value={u.status} onValueChange={v => updateUserStatus(u.user_id, v as "active" | "completed" | "withdrawn")}>
+                            <SelectTrigger className="h-8 w-32">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="active">Active</SelectItem>
                               <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="withdrawn">Withdrawn</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
