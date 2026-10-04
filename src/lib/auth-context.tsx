@@ -12,7 +12,7 @@ interface Profile {
   gender: string | null;
   church: string | null;
   registration_id: string;
-  status: "active" | "completed";
+  status: "active" | "completed" | "withdrawn";
   batch_year: number;
 }
 
