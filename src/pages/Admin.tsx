@@ -100,20 +100,27 @@ export default function Admin() {
   };
 
   const fetchAttendance = async () => {
-    const { data: attRows, error } = await supabase
-      .from("attendance")
-      .select("*")
-      .order("marked_at", { ascending: false });
-    if (error || !attRows) {
+    // Fetch every row in pages of 1000 (the backend caps a single request at 1000 rows)
+    const fetchAll = async (build: (from: number, to: number) => any) => {
+      const PAGE = 1000;
+      const all: any[] = [];
+      for (let from = 0; ; from += PAGE) {
+        const { data, error } = await build(from, from + PAGE - 1);
+        if (error) return null;
+        all.push(...(data ?? []));
+        if (!data || data.length < PAGE) break;
+      }
+      return all;
+    };
+    const [attRows, profs, { data: sess }] = await Promise.all([
+      fetchAll((f, t) => supabase.from("attendance").select("*").order("marked_at", { ascending: false }).order("id").range(f, t)),
+      fetchAll((f, t) => supabase.from("profiles").select("user_id, name, registration_id").order("id").range(f, t)),
+      supabase.from("sessions").select("id, month, title"),
+    ]);
+    if (!attRows) {
       setAttendance([]);
       return;
     }
-    const userIds = Array.from(new Set(attRows.map((a: any) => a.user_id)));
-    const sessionIds = Array.from(new Set(attRows.map((a: any) => a.session_id)));
-    const [{ data: profs }, { data: sess }] = await Promise.all([
-      supabase.from("profiles").select("user_id, name, registration_id").in("user_id", userIds),
-      supabase.from("sessions").select("id, month, title").in("id", sessionIds),
-    ]);
     const profMap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
     const sessMap = new Map((sess ?? []).map((s: any) => [s.id, s]));
     const merged = attRows.map((a: any) => ({
