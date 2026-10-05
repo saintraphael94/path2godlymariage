@@ -54,9 +54,21 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${profile.status === "active" ? "bg-green-100 text-green-800" : "bg-gold-light text-gold"}`}>
-                {profile.status === "active" ? "Active" : "Completed"}
-              </span>
+              {profile.status === "active" && (
+                <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                  Active
+                </span>
+              )}
+              {profile.status === "completed" && (
+                <span className="inline-flex items-center rounded-full bg-gold-light px-2.5 py-0.5 text-xs font-medium text-gold">
+                  Completed
+                </span>
+              )}
+              {profile.status === "withdrawn" && (
+                <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                  Withdrawn
+                </span>
+              )}
             </CardContent>
           </Card>
 
