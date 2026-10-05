@@ -75,9 +75,21 @@ export default function Verify() {
                 {result.name}
               </h2>
               <p className="mb-2 text-sm text-muted-foreground">Batch {result.batch_year}/{String(result.batch_year + 1).slice(-2)}</p>
-              <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${result.status === "active" ? "bg-green-100 text-green-800" : "bg-gold-light text-gold"}`}>
-                {result.status === "active" ? "Active" : "Completed"}
-              </span>
+              {result.status === "active" && (
+                <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800">
+                  Active
+                </span>
+              )}
+              {result.status === "completed" && (
+                <span className="inline-flex items-center rounded-full bg-gold-light px-3 py-1 text-xs font-medium text-gold">
+                  Completed
+                </span>
+              )}
+              {result.status === "withdrawn" && (
+                <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800">
+                  Withdrawn
+                </span>
+              )}
             </CardContent>
           </Card>
         )}
